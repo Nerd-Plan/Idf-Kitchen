@@ -1,0 +1,136 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Recommended production rules for this app.
+    //
+    // Assumptions:
+    // 1. Every Firebase-authenticated user has a roles/{uid} document.
+    // 2. roles/{uid}.role is one of:
+    //    appManager | nagad | admin | cook | soldier
+    // 3. Non-global users have roles/{uid}.baseId set to their base.
+    // 4. If a nagad is allowed to create a base, set canCreateBase: true.
+    //
+    // Important:
+    // The current app still supports anonymous auth and a local PIN-based
+    // "login" that Firestore cannot see. With that flow, secure per-role
+    // writes are not possible from rules alone. These rules fit the repo's
+    // intended roles/{uid} production model.
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isCompatMode() {
+      return signedIn() && !hasRoleDoc();
+    }
+
+    function hasRoleDoc() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/roles/$(request.auth.uid));
+    }
+
+    function roleDoc() {
+      return get(/databases/$(database)/documents/roles/$(request.auth.uid));
+    }
+
+    function isAppManager() {
+      return hasRoleDoc() && roleDoc().data.role == "appManager";
+    }
+
+    function isNagad() {
+      return hasRoleDoc() && roleDoc().data.role == "nagad";
+    }
+
+    function isKitchenEditor() {
+      return isAppManager()
+        || (
+          hasRoleDoc()
+          && (
+            roleDoc().data.role == "nagad"
+            || roleDoc().data.role == "admin"
+            || roleDoc().data.role == "cook"
+          )
+        );
+    }
+
+    function isScopedToBase(baseId) {
+      return hasRoleDoc() && roleDoc().data.baseId == baseId;
+    }
+
+    function canCreateBase() {
+      return isAppManager()
+        || (isNagad() && roleDoc().data.canCreateBase == true);
+    }
+
+    function canManageStaffForBase(baseId) {
+      return isAppManager() || (isNagad() && isScopedToBase(baseId));
+    }
+
+    function isSoldierFeedbackOnlyUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(["feedback", "updatedAt"])
+        && request.resource.data.feedback is list
+        && resource.data.feedback is list
+        && request.resource.data.feedback.size() >= resource.data.feedback.size();
+    }
+
+    match /roles/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAppManager());
+      allow write: if false;
+    }
+
+    match /bases/{baseId} {
+      allow read: if signedIn();
+      allow create: if isCompatMode() || canCreateBase();
+      allow update, delete: if isCompatMode() || isAppManager();
+    }
+
+    match /staff/{staffId} {
+      // The current app loads staff before local PIN login, so reads remain
+      // authenticated-only here. Tightening this further would require app
+      // auth changes because the client currently reads pinHash values.
+      allow read: if signedIn();
+      allow create: if isCompatMode() || (
+        signedIn()
+        && request.resource.data.baseId is string
+        && canManageStaffForBase(request.resource.data.baseId)
+      );
+      allow update: if isCompatMode() || (
+        signedIn()
+        && (
+          (
+            resource.data.baseId is string
+            && canManageStaffForBase(resource.data.baseId)
+          )
+          || (
+            request.resource.data.baseId is string
+            && canManageStaffForBase(request.resource.data.baseId)
+          )
+        )
+      );
+      allow delete: if isCompatMode() || isAppManager();
+    }
+
+    match /kitchen/{baseId} {
+      // The app preloads base data before local role/PIN selection, so reads
+      // stay authenticated-only here for compatibility with the current flow.
+      allow read: if signedIn();
+      allow create: if isCompatMode() || (isKitchenEditor() && isScopedToBase(baseId));
+      allow update: if isCompatMode()
+        || (isKitchenEditor() && isScopedToBase(baseId))
+        || (
+          hasRoleDoc()
+          && roleDoc().data.role == "soldier"
+          && isScopedToBase(baseId)
+          && isSoldierFeedbackOnlyUpdate()
+        );
+      allow delete: if isCompatMode() || isAppManager();
+    }
+
+    // Legacy collections exist in the codebase but are not part of the active
+    // sync path used by src/Utils/storage.js. Deny them by default until the
+    // app starts using them with a clear security model.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

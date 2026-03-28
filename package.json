@@ -1,0 +1,40 @@
+{
+  "name": "idf-kitchen",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "mobile:sync": "bun run build && bunx cap sync",
+    "mobile:android": "bun run build && bunx cap sync android && bunx cap open android",
+    "mobile:ios": "bun run build && bunx cap sync ios && bunx cap open ios",
+    "lint": "eslint .",
+    "test": "node --test --experimental-test-isolation=none tests/hash.test.js tests/permissions.test.js tests/globalSearch.test.js tests/statusReport.test.js",
+    "test:watch": "node --test --watch --experimental-test-isolation=none tests/hash.test.js tests/permissions.test.js tests/globalSearch.test.js tests/statusReport.test.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/ios": "^8.2.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "firebase": "^12.10.0",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.2.0",
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "vite": "^7.3.1"
+  }
+}
