@@ -20,6 +20,7 @@ import { buildGlobalSearchIndex } from "../../Utils/globalSearch";
 import { openStatusReportPrint } from "../../Utils/statusReport";
 import { warmTheme, withAlpha } from "../../Utils/uiTheme";
 import { canUserAccessPage, getVisibleSectionKeysForUser } from "../../Utils/workflow";
+import { getDemoInitialPage } from "../../Utils/demoMode";
 
 const InventoryPage = lazy(() => import("./InventoryPageScreen"));
 const SaladsPage = lazy(() => import("./SaladsPageScreen"));
@@ -28,7 +29,9 @@ const MorningCookTasks = lazy(() => import("../Morning/MorningCookTasks"));
 const PrepPageScreen = lazy(() => import("./PrepPageScreen"));
 
 export default function CookView({ data, user, staff, setData, onLogout }) {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() =>
+    getDemoInitialPage(["home", "inventory", "salads", "hot", "morningTasks", "prep"], "home")
+  );
   const [saved, setSaved] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBoardOpen, setIsBoardOpen] = useState(false);

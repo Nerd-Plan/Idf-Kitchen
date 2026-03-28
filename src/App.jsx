@@ -6,6 +6,7 @@ import { warmTheme } from "./Utils/uiTheme";
 import { hashPin } from "./Utils/hash";
 import { AVATARS, STAFF_COLORS } from "./Utils/constans";
 import { isAppManager as isAppManagerUser } from "./Utils/permissions";
+import { createDemoAppState, readDemoConfig } from "./Utils/demoMode";
 
 const LoginScreen = lazy(() => import("./Screens/Login/loginScreen"));
 const SoldierView = lazy(() => import("./Screens/Soldier/soldierScreen"));
@@ -63,12 +64,16 @@ const KITCHEN_SYNC_DEBOUNCE_MS = 700;
 const STAFF_SYNC_DEBOUNCE_MS = 600;
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [bases, setBases] = useState(() => clone(DEFAULT_BASES));
-  const [activeBaseId, setActiveBaseId] = useState(() => DEFAULT_BASES[0]?.id ?? "main");
-  const [staff, setStaff] = useState(() => clone(DEFAULT_STAFF));
-  const [data, setData] = useState(() => makeKitchen());
-  const [isReady, setIsReady] = useState(false);
+  const [demoState] = useState(() => {
+    const demoConfig = readDemoConfig();
+    return demoConfig ? createDemoAppState(demoConfig.role) : null;
+  });
+  const [user, setUser] = useState(() => demoState?.user ?? null);
+  const [bases, setBases] = useState(() => demoState?.bases ?? clone(DEFAULT_BASES));
+  const [activeBaseId, setActiveBaseId] = useState(() => demoState?.activeBaseId ?? DEFAULT_BASES[0]?.id ?? "main");
+  const [staff, setStaff] = useState(() => demoState?.staff ?? clone(DEFAULT_STAFF));
+  const [data, setData] = useState(() => demoState?.data ?? makeKitchen());
+  const [isReady, setIsReady] = useState(() => Boolean(demoState));
   const [isBaseSwitching, setIsBaseSwitching] = useState(false);
   const [cloudError, setCloudError] = useState("");
   const kitchenSyncTimerRef = useRef(null);
@@ -82,6 +87,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (demoState) {
+      lastKitchenBaseIdRef.current = demoState.activeBaseId;
+      lastKitchenSnapshotRef.current = snapshot(demoState.data);
+      lastStaffSnapshotRef.current = snapshot(demoState.staff);
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function hydrateAppState() {
@@ -115,7 +127,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!isReady || !activeBaseId || isBaseSwitching) return undefined;
+    if (demoState || !isReady || !activeBaseId || isBaseSwitching) return undefined;
     const nextSnapshot = snapshot(data);
 
     if (lastKitchenBaseIdRef.current !== activeBaseId) {
@@ -143,10 +155,10 @@ export default function App() {
       cancelled = true;
       if (kitchenSyncTimerRef.current) clearTimeout(kitchenSyncTimerRef.current);
     };
-  }, [activeBaseId, data, isBaseSwitching, isReady]);
+  }, [activeBaseId, data, demoState, isBaseSwitching, isReady]);
 
   useEffect(() => {
-    if (!isReady) return undefined;
+    if (demoState || !isReady) return undefined;
     const nextSnapshot = snapshot(staff);
     if (lastStaffSnapshotRef.current === nextSnapshot) return undefined;
 
@@ -168,7 +180,7 @@ export default function App() {
       cancelled = true;
       if (staffSyncTimerRef.current) clearTimeout(staffSyncTimerRef.current);
     };
-  }, [staff, isReady]);
+  }, [demoState, isReady, staff]);
 
   useEffect(() => {
     return () => {
@@ -181,6 +193,12 @@ export default function App() {
     async (incomingUser) => {
       if (!incomingUser?.id || !incomingUser?.role || !incomingUser?.baseId) return;
       if (incomingUser.role === "nagad" && incomingUser.isVerifiedNagad === false) return;
+
+      if (demoState) {
+        setUser(incomingUser);
+        setCloudError("");
+        return;
+      }
 
       setIsBaseSwitching(true);
       try {
@@ -201,7 +219,7 @@ export default function App() {
         setIsBaseSwitching(false);
       }
     },
-    [bases]
+    [bases, demoState]
   );
 
   const logout = useCallback(() => setUser(null), []);
@@ -392,10 +410,12 @@ export default function App() {
           onCreateBaseWithNagad={createBaseWithNagad}
           onUpgradePinHash={upgradePinHash}
           onResetStaff={() => {
-            const fallbackStaff = attachStaffBases(clone(DEFAULT_STAFF), bases);
+            const fallbackStaff = demoState?.staff ?? attachStaffBases(clone(DEFAULT_STAFF), bases);
             lastStaffSnapshotRef.current = snapshot(fallbackStaff);
             setStaff(fallbackStaff);
-            void saveStaff(fallbackStaff);
+            if (!demoState) {
+              void saveStaff(fallbackStaff);
+            }
           }}
         />
       </Suspense>

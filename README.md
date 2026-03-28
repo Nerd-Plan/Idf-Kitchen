@@ -11,6 +11,38 @@ Suggested repo description:
 
 The app combines operational tracking, staff coordination, and base-specific data in one place, with Firebase/Firestore sync and local cache fallbacks.
 
+## Screenshot Gallery
+
+The screenshots below were captured from the running app using seeded demo data, so the README reflects the real UI instead of mockups.
+
+### Login
+
+![Login screen](docs/screenshots/login.png)
+
+### Soldier View
+
+![Soldier daily menu](docs/screenshots/soldier.png)
+
+### Cook Views
+
+![Cook dashboard](docs/screenshots/cook-dashboard.png)
+
+![Cook inventory page](docs/screenshots/cook-inventory.png)
+
+![Cook salads page](docs/screenshots/cook-salads.png)
+
+![Cook hot food page](docs/screenshots/cook-hot-food.png)
+
+![Cook morning tasks page](docs/screenshots/cook-morning-tasks.png)
+
+![Cook prep page](docs/screenshots/cook-prep.png)
+
+### Nagad Views
+
+![Nagad dashboard](docs/screenshots/nagad-dashboard.png)
+
+![Nagad staff management view](docs/screenshots/nagad-staff.png)
+
 ## Main App Areas
 
 - Role-based login flow for soldiers, cooks, kitchen managers, and verified `nagad` users
@@ -50,6 +82,21 @@ The app combines operational tracking, staff coordination, and base-specific dat
 - Staff records include role, base assignment, permissions, and category ownership
 - Kitchen records include inventory, salads, hot food, bulletins, feedback, morning tasks, prep tasks, and audit history
 - Local cache is used as a fallback when cloud sync is unavailable
+
+## Documentation Demo Mode
+
+For documentation or release screenshots, the app supports seeded demo query parameters:
+
+- `?demoRole=login`
+- `?demoRole=soldier`
+- `?demoRole=cook`
+- `?demoRole=nagad`
+- `?demoRole=cook&demoPage=stock`
+- `?demoRole=cook&demoPage=salads`
+- `?demoRole=cook&demoPage=hot`
+- `?demoRole=cook&demoPage=morningTasks`
+- `?demoRole=cook&demoPage=prep`
+- `?demoRole=nagad&demoPage=staff`
 
 ## Development
 

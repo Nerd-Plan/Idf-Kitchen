@@ -25,6 +25,7 @@ import { openStatusReportPrint } from "../../Utils/statusReport";
 import { warmTheme, withAlpha } from "../../Utils/uiTheme";
 import { canAccessStaffArea, canEditKitchen, isAppManager as isAppManagerUser, isVerifiedNagad } from "../../Utils/permissions";
 import { buildTeamCoverage, getTeamCategories } from "../../Utils/workflow";
+import { getDemoInitialPage } from "../../Utils/demoMode";
 
 const InventoryPage = lazy(() => import("../KitchenView/InventoryPageScreen"));
 const SaladsPage = lazy(() => import("../KitchenView/SaladsPageScreen"));
@@ -40,7 +41,9 @@ export default function AdminDashboard({ data, user, staff, bases, setData, setS
   const isAppManager = isAppManagerUser(user);
   const canKitchenEdit = canEditKitchen(user);
   const canAccessStaff = canAccessStaffArea(user);
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() =>
+    getDemoInitialPage(["home", "inventory", "salads", "hot", "feedback", "morningCooks", "morningTasks", "prep", "staff"], "home")
+  );
   const [editMode, setEditMode] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
