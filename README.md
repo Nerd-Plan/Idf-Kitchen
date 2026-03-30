@@ -17,31 +17,91 @@ The screenshots below were captured from the running app using seeded demo data,
 
 ### Login
 
+#### Login Screen
+
 ![Login screen](docs/screenshots/login.png)
+
+> **What it represents:** The entry point for selecting the working base and signing into the correct kitchen context.  
+> **What's inside:** The app badge and title, a base selector, a user or role selector, a primary `Continue` button, and a secondary action for creating a fresh demo base and kitchen.  
+> **What each part does:** The selectors choose where and as whom to enter, `Continue` loads the app with that context, and the demo action seeds a clean environment for testing, screenshots, or onboarding.
 
 ### Soldier View
 
+#### Soldier Daily Menu
+
 ![Soldier daily menu](docs/screenshots/soldier.png)
+
+> **What it represents:** The soldier-facing daily meal board for checking what is being served across the day.  
+> **What's inside:** A top status strip for the active base and view, a daily summary card, and separate meal sections for breakfast, lunch, and dinner with dish cards and expandable rows.  
+> **What each part does:** The summary card shows the current service window, each meal block groups the relevant dishes, the small cards preview menu items, and the expandable rows let soldiers inspect more detail before rating or giving feedback.
 
 ### Cook Views
 
+#### Cook Dashboard
+
 ![Cook dashboard](docs/screenshots/cook-dashboard.png)
+
+> **What it represents:** The cook's main operations hub for jumping into the active kitchen workflows.  
+> **What's inside:** A utility bar for search, export, and context, a left `Side Note` column for quick updates, active alerts, and daily missions, and a grid of shortcut cards for stock, salads, hot food, prep, and cleaning.  
+> **What each part does:** The note composer publishes updates, the alert cards surface urgent issues, the daily mission list tracks what is done, and the large cards open each operational work area with live counters.
+
+#### Cook Inventory Page
 
 ![Cook inventory page](docs/screenshots/cook-inventory.png)
 
+> **What it represents:** The stock management screen used by cooks to monitor supplies by category.  
+> **What's inside:** A header summary for the current base and page, action chips for export or filtering, and collapsible inventory sections such as dry storage, vegetables, cleaning supplies, and frozen items.  
+> **What each part does:** Each stock row shows the product name, quantity, and status, while the row actions let the team update counts, mark shortages, or remove items so the inventory stays accurate during service.
+
+#### Cook Salads Page
+
 ![Cook salads page](docs/screenshots/cook-salads.png)
+
+> **What it represents:** The salad station tracker for refrigerated trays and refill readiness.  
+> **What's inside:** A page summary card, quick actions for adding a fridge or a new salad, and fridge panels that list each salad with its current percentage fill.  
+> **What each part does:** The fridge cards organize salads by location, the percentage bar shows remaining quantity at a glance, and the action buttons let staff refill, replace, empty, move, or delete a salad entry.
+
+#### Cook Hot Food Page
 
 ![Cook hot food page](docs/screenshots/cook-hot-food.png)
 
+> **What it represents:** The hot-food control view for following dishes across cooking or heating zones.  
+> **What's inside:** A page summary block and several zone cards, each tied to one active dish and showing the dish name together with quick action controls.  
+> **What each part does:** The zone cards represent separate burners or serving positions, the dish row identifies what is cooking there, and the buttons help cooks replace a dish, clear a finished item, or update its serving status as the line changes.
+
+#### Cook Morning Tasks Page
+
 ![Cook morning tasks page](docs/screenshots/cook-morning-tasks.png)
+
+> **What it represents:** The cook workspace overview with the morning workflow widgets visible on the left side.  
+> **What's inside:** The `Side Note` panel for quick posting, urgent updates, the daily checklist, and the same navigation cards that lead into the operational modules used during the morning shift.  
+> **What each part does:** The left column helps the shift communicate and close routine tasks, while the large cards on the right route the cook into the exact area that now needs attention.
+
+#### Cook Prep Page
 
 ![Cook prep page](docs/screenshots/cook-prep.png)
 
+> **What it represents:** The prep-task board for organizing kitchen preparation work before or between meal windows.  
+> **What's inside:** A summary header, a completion progress bar, a list of prep tasks with checkboxes and counters, and a form row for adding a new task.  
+> **What each part does:** The progress bar shows how much of the prep plan is complete, each task row can be checked off when finished, and the bottom input area lets staff append new prep work as needs change.
+
 ### Nagad Views
+
+#### Nagad Dashboard
 
 ![Nagad dashboard](docs/screenshots/nagad-dashboard.png)
 
+> **What it represents:** The management dashboard for the `nagad`, combining staffing awareness and operational control in one place.  
+> **What's inside:** A left column for notes, urgent updates, and the daily checklist, a top summary panel with counts and current base context, category chips for staffing coverage, and a larger grid of management modules.  
+> **What each part does:** The summary panel reports kitchen health at a glance, the category chips highlight who is assigned where, the warning banner surfaces shortages, and the module cards open the major management areas such as stock, salads, hot food, reports, and staff operations.
+
+#### Nagad Staff Management View
+
 ![Nagad staff management view](docs/screenshots/nagad-staff.png)
+
+> **What it represents:** The staff assignment screen for placing people into the right kitchen categories.  
+> **What's inside:** A page summary header and a stacked list of assignment rows for areas like salads, cooking, warehouse, root vegetables, and supply.  
+> **What each part does:** Each row represents one operational category, the dropdown chooses which worker is assigned to it, the text line explains the responsibility of that station, and the remove control clears the assignment when staffing changes.
 
 ## Main App Areas
 
